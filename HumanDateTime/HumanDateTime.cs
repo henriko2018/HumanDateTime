@@ -6,37 +6,23 @@ public static class HumanDateTime
     {
         var datePart = GetDatePart(dateTime);
         var timePart = GetTimePart(dateTime);
-        if (datePart != "")
-            datePart += " ";
-        return datePart + timePart;
+        return datePart == "" ? timePart : datePart + " " + timePart;
     }
 
-    private static string GetTimePart(DateTime dateTime)
+    public static string ToHumanString(DateTime from, DateTime to)
     {
-        var diff = dateTime - CurrentDateTimeProvider();
-        var past = diff.Ticks <= 0;
-        var diffInMinutes = Math.Abs(Math.Round(diff.TotalMinutes));
-        return past
-            ? diffInMinutes switch
-            {
-                0 => "nyss",
-                1 => "1 minut sedan",
-                < 60 => diffInMinutes + " minuter sedan",
-                _ => dateTime.TimeOfDay.ToString(TimeSpanFormat)
-            }
-            : diffInMinutes switch
-            {
-                0 => "straxt",
-                1 => "om 1 minut",
-                < 60 => "om " + diffInMinutes + " minuter",
-                _ => dateTime.TimeOfDay.ToString(TimeSpanFormat)
-            };
+        var fromDatePart = GetDatePart(from);
+        fromDatePart = fromDatePart == "" ? "i dag" : fromDatePart;
+        var toDatePart = GetDatePart(to);
+        toDatePart = toDatePart == "" ? "i dag" : toDatePart;
+        return fromDatePart == toDatePart
+            ? $"{fromDatePart} {GetTimePart(from)}-{GetTimePart(to)}"
+            : $"{fromDatePart} {GetTimePart(from)} - {toDatePart} {GetTimePart(to)}";
     }
 
     private static string GetDatePart(DateTime dateTime)
     {
-        var diff = dateTime - CurrentDateTimeProvider();
-        var past = diff.Ticks <= 0;
+        var past = (dateTime - CurrentDateTimeProvider()).Ticks <= 0;
         var diffInDays = Math.Abs((dateTime.Date - CurrentDateTimeProvider().Date).TotalDays);
         return past
             ? diffInDays switch
@@ -74,6 +60,28 @@ public static class HumanDateTime
                     _ => throw new ArgumentOutOfRangeException(nameof(dateTime), $"Unkown day of week \"{dateTime.DayOfWeek}\""),
                 },
                 _ => dateTime.ToString(DateFormat)
+            };
+    }
+
+    private static string GetTimePart(DateTime dateTime)
+    {
+        var diff = dateTime - CurrentDateTimeProvider();
+        var past = diff.Ticks <= 0;
+        var diffInMinutes = Math.Abs(Math.Round(diff.TotalMinutes));
+        return past
+            ? diffInMinutes switch
+            {
+                0 => "nyss",
+                1 => "1 minut sedan",
+                < 60 => diffInMinutes + " minuter sedan",
+                _ => dateTime.TimeOfDay.ToString(TimeSpanFormat)
+            }
+            : diffInMinutes switch
+            {
+                0 => "straxt",
+                1 => "om 1 minut",
+                < 60 => "om " + diffInMinutes + " minuter",
+                _ => dateTime.TimeOfDay.ToString(TimeSpanFormat)
             };
     }
 
