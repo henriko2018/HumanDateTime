@@ -2,32 +2,45 @@
 
 public static class HumanDateTime
 {
-    public static string ToHumanString(this DateTime dateTime)
+    public static string ToHumanString(this DateTime dateTime, bool renderToday = false)
     {
-        var datePart = GetDatePart(dateTime);
+        var datePart = GetDatePart(dateTime, renderToday);
         var timePart = GetTimePart(dateTime);
         return datePart == "" ? timePart : datePart + " " + timePart;
     }
 
+    public static string ToHumanString(this DateTime? dateTime, bool renderToday = false)
+        => dateTime == null ? "" : ToHumanString(dateTime.Value, renderToday);
+
     public static string ToHumanString(DateTime from, DateTime to)
     {
-        var fromDatePart = GetDatePart(from);
-        fromDatePart = fromDatePart == "" ? "i dag" : fromDatePart;
-        var toDatePart = GetDatePart(to);
-        toDatePart = toDatePart == "" ? "i dag" : toDatePart;
+        var fromDatePart = GetDatePart(from, true);
+        var toDatePart = GetDatePart(to, true);
         return fromDatePart == toDatePart
             ? $"{fromDatePart} {GetTimePart(from)}-{GetTimePart(to)}"
             : $"{fromDatePart} {GetTimePart(from)} - {toDatePart} {GetTimePart(to)}";
     }
 
-    private static string GetDatePart(DateTime dateTime)
+    public static string ToHumanString(DateTime? from, DateTime? to)
+    {
+        if (from != null && to != null)
+            return ToHumanString(from.Value, to.Value);
+        else if (from != null && to == null)
+            return $"{ToHumanString(from.Value, true)} -";
+        else if (from == null && to != null)
+            return $"- {ToHumanString(to.Value, true)}";
+        else
+            return "";
+    }
+
+    private static string GetDatePart(DateTime dateTime, bool renderToday)
     {
         var past = (dateTime - CurrentDateTimeProvider()).Ticks <= 0;
         var diffInDays = Math.Abs((dateTime.Date - CurrentDateTimeProvider().Date).TotalDays);
         return past
             ? diffInDays switch
             {
-                0 => "",
+                0 => renderToday ? "i dag" : "",
                 1 => "i går",
                 2 => "i förrgår",
                 < 7 => dateTime.DayOfWeek switch
@@ -45,7 +58,7 @@ public static class HumanDateTime
             }
             : diffInDays switch
             {
-                0 => "",
+                0 => renderToday ? "i dag" : "",
                 1 => "i morgon",
                 2 => "i övermorgon",
                 < 7 => dateTime.DayOfWeek switch

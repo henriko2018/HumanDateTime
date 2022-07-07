@@ -11,7 +11,7 @@
 	  <RepositoryUrl>https://github.com/henriko2018/HumanDateTime</RepositoryUrl>
 	  <NeutralLanguage>sv-SE</NeutralLanguage>
 	  <PackageTags>DateTime; utilitiy</PackageTags>
-	  <Version>1.0.1</Version>
+	  <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

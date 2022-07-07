@@ -8,6 +8,10 @@ public class DateTimeTests
     [MemberData(nameof(TestData))]
     public void OutputsExpected(DateTime date, string expected) => Assert.Equal(expected, date.ToHumanString());
 
+    [Theory]
+    [MemberData(nameof(NullableTestData))]
+    public void NullableReturnsExpected(DateTime? date, string expected) => Assert.Equal(expected, date.ToHumanString());
+
     public static IEnumerable<object[]> TestData =>
         new List<object[]>
         {
@@ -38,5 +42,12 @@ public class DateTimeTests
             new object[] { new DateTime(2022, 06, 04, 00, 00, 00), "på lördag 00:00"},
             new object[] { new DateTime(2022, 06, 07, 00, 00, 00), "på tisdag 00:00"},
             new object[] { new DateTime(2022, 06, 08, 00, 00, 00), "2022-06-08 00:00"},
+        };
+
+    public static IEnumerable<object?[]> NullableTestData =>
+        new List<object?[]>
+        {
+            new object?[] { new DateTime?(new DateTime(2022, 06, 01, 12, 59, 31)), "nyss" },
+            new object?[] { null, "" }
         };
 }
